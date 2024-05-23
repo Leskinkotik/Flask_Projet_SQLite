@@ -80,7 +80,7 @@ def enregistrer_client():
 @app.route('/fiche_nom/', methods=['GET'])
 def search_client_by_name():
     name = request.args.get('name')
-    
+
     if not name:
         return render_template('formulaire_recherche.html', data=None, message=None)
 
@@ -90,15 +90,15 @@ def search_client_by_name():
         cursor.execute('SELECT * FROM clients WHERE nom LIKE ?', ('%' + name + '%',))
         data = cursor.fetchall()
         conn.close()
-        
+
         if data:
             return render_template('formulaire_recherche.html', data=data, message=None)
         else:
             return render_template('formulaire_recherche.html', data=None, message='Aucun client trouvé')
-    
+
     except Exception as e:
         print(f"Erreur lors de l'accès à la base de données: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'error': 'Internal server error'}), 500
         
 if __name__ == "__main__":
   app.run(debug=True)
