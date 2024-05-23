@@ -86,7 +86,7 @@ def enregistrer_client():
 
 @app.route('/fiche_nom/', methods=['GET'])
 def search_client_by_name():
-    if not est_authentifie_admin():
+    if not est_authentifie_user():
         # Rediriger vers la page d'authentification si l'utilisateur n'est pas authentifié
         return redirect(url_for('authentification'))
         
