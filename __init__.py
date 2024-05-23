@@ -1,21 +1,12 @@
 from flask import Flask, render_template_string, render_template, jsonify, request, redirect, url_for, session
 from flask import render_template
 from flask import json
-from functools import wraps
 from urllib.request import urlopen
 from werkzeug.utils import secure_filename
 import sqlite3
 
 app = Flask(__name__)                                                                                                                  
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Clé secrète pour les sessions
-
-def user_login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('user_authenticated'):
-            return redirect(url_for('authentification'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 # Fonction pour créer une clé "authentifie" dans la session utilisateur
 def est_authentifie():
@@ -38,7 +29,7 @@ def lecture():
 def authentification():
     if request.method == 'POST':
         # Vérifier les identifiants
-        if request.form['username'] == 'user' and request.form['password'] == '12345': # password à cacher par la suite
+        if request.form['username'] == 'admin' and request.form['password'] == 'password': # password à cacher par la suite
             session['authentifie'] = True
             # Rediriger vers la route lecture après une authentification réussie
             return redirect(url_for('lecture'))
@@ -85,32 +76,6 @@ def enregistrer_client():
     conn.commit()
     conn.close()
     return redirect('/consultation/')  # Rediriger vers la page d'accueil après l'enregistrement
-
-@app.route('/fiche_nom/', methods=['GET'])
-@user_login_required
-def search_client_by_name():
-    name = request.args.get('name')
-    
-    if not name:
-        return render_template('formulaire_recherche.html', data=None, message=None)
-
-    try:
-        conn = sqlite3.connect('database.db')
-        cursor = conn.cursor()
-        cursor.execute('SELECT * FROM clients WHERE nom LIKE ?', ('%' + name + '%',))
-        data = cursor.fetchall()
-        conn.close()
-        
-        if data:
-            return render_template('formulaire_recherche.html', data=data, message=None)
-        else:
-            return render_template('formulaire_recherche.html', data=None, message='Aucun client trouvé')
-    
-    except Exception as e:
-        print(f"Erreur lors de l'accès à la base de données: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-
-
+                                                                                                                                       
 if __name__ == "__main__":
   app.run(debug=True)
